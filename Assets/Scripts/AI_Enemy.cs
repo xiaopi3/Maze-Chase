@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using System.Linq;
+using UnityEditor.Animations;
 
 public enum AI_ENEMY_STATE
 {
@@ -22,10 +23,11 @@ public class AI_Enemy : MonoBehaviour {
     public float DistEps = 1;
     public float FieldOfView=60;
     public float ChaseTimeOut = 4f;
-    public float AttackDelay = 0.5f;
+    public float AttackDelay = 1f;
     public float AttackDamage = 10;
     private bool CanSeePlayer=false;
     private EnemyHealth EnemyHealthScript;
+    private AnimatorController ac;
 
     //
 
@@ -42,6 +44,7 @@ public class AI_Enemy : MonoBehaviour {
         ThisCollider = GetComponent<BoxCollider>();
         EnemyHealthScript = GetComponent<EnemyHealth>();
         Waypoints = (from GameObject GO in GameObject.FindGameObjectsWithTag("Waypoint") select GO.transform).ToArray();
+        ac = GetComponent<AnimatorController>();
     }
 	// Use this for initialization
 	void Start () {
@@ -171,6 +174,7 @@ public class AI_Enemy : MonoBehaviour {
         print("攻击");
         CurrentState = AI_ENEMY_STATE.ATTACK;
         ThisAnimator.SetTrigger((int)AI_ENEMY_STATE.ATTACK);
+        //想动态控制敌人攻击速度，目前未找到实现方法。
         PlayerTransform.SendMessage("ChangeHealth", -AttackDamage, SendMessageOptions.DontRequireReceiver);
         ThisAgent.Stop();
         ThisAgent.ResetPath();
@@ -185,6 +189,7 @@ public class AI_Enemy : MonoBehaviour {
             }
             if (ElapsedTime >= AttackDelay)
             {
+                
                 print("继续攻击");
                 ElapsedTime = 0f;
                 PlayerTransform.SendMessage("ChangeHealth", -AttackDamage, SendMessageOptions.DontRequireReceiver);
