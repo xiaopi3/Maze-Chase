@@ -53,9 +53,9 @@ public class AI_Enemy : MonoBehaviour {
         //CanSeePlayer = false;
         if (!ThisCollider.bounds.Contains(PlayerView.position))
             return;
-        print("包含目标");
+        
         CanSeePlayer = HaveLineSightToPlayer(PlayerTransform);
-        if(CanSeePlayer) print("看到目标！！！！update");
+        
 	}
     public IEnumerator State_Idle()
     {
@@ -84,7 +84,7 @@ public class AI_Enemy : MonoBehaviour {
     }
     public IEnumerator State_Patrol()
     {
-        print("Patrol");
+        print("巡逻");
         CurrentState = AI_ENEMY_STATE.PATROL;
         ThisAnimator.SetTrigger((int)AI_ENEMY_STATE.PATROL);
         Transform RandomDest = Waypoints[Random.Range(0, Waypoints.Length)];
@@ -94,7 +94,7 @@ public class AI_Enemy : MonoBehaviour {
             //print("正在前往目的地");
             if (CanSeePlayer)
             {
-                print("发现目标");
+                
                 StartCoroutine(State_Chase());
                 yield break;
             }
@@ -116,13 +116,14 @@ public class AI_Enemy : MonoBehaviour {
             return false;
         RaycastHit hitInfo;
         Physics.Linecast(ThisTransform.position, Player.position, out hitInfo);
-        print(hitInfo.collider);
+        //print(hitInfo.collider);
         if (Physics.Linecast(ThisTransform.position, Player.position,out hitInfo))
             return false;
         return true;
     }
     public IEnumerator State_Chase()
     {
+        print("追逐");
         CurrentState = AI_ENEMY_STATE.CHASE;
         ThisAnimator.SetTrigger((int)AI_ENEMY_STATE.CHASE);
         while (CurrentState == AI_ENEMY_STATE.CHASE)
@@ -150,6 +151,11 @@ public class AI_Enemy : MonoBehaviour {
                             break;
                         }
                     }
+                    if (CanSeePlayer&&Vector3.Distance(ThisTransform.position, PlayerTransform.position) <= DistEps)
+                    {
+                        StartCoroutine(State_Attack());
+                        yield break;
+                    }
                 }
             }
             if (Vector3.Distance(ThisTransform.position, PlayerTransform.position) <= DistEps)
@@ -162,6 +168,7 @@ public class AI_Enemy : MonoBehaviour {
     }
     public IEnumerator State_Attack()//此处是否能控制动画和伤害同步显示？还未解决
     {
+        print("攻击");
         CurrentState = AI_ENEMY_STATE.ATTACK;
         ThisAnimator.SetTrigger((int)AI_ENEMY_STATE.ATTACK);
         PlayerTransform.SendMessage("ChangeHealth", -AttackDamage, SendMessageOptions.DontRequireReceiver);
@@ -178,6 +185,7 @@ public class AI_Enemy : MonoBehaviour {
             }
             if (ElapsedTime >= AttackDelay)
             {
+                print("继续攻击");
                 ElapsedTime = 0f;
                 PlayerTransform.SendMessage("ChangeHealth", -AttackDamage, SendMessageOptions.DontRequireReceiver);
             }
