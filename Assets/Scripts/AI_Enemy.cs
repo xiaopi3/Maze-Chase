@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using System.Linq;
-using UnityEditor.Animations;
 
 public enum AI_ENEMY_STATE
 {
@@ -27,7 +26,6 @@ public class AI_Enemy : MonoBehaviour {
     public float AttackDamage = 10;
     private bool CanSeePlayer=false;
     private EnemyHealth EnemyHealthScript;
-    private AnimatorController ac;
 
     //
 
@@ -44,7 +42,6 @@ public class AI_Enemy : MonoBehaviour {
         ThisCollider = GetComponent<BoxCollider>();
         EnemyHealthScript = GetComponent<EnemyHealth>();
         Waypoints = (from GameObject GO in GameObject.FindGameObjectsWithTag("Waypoint") select GO.transform).ToArray();
-        ac = GetComponent<AnimatorController>();
     }
 	// Use this for initialization
 	void Start () {
@@ -62,7 +59,7 @@ public class AI_Enemy : MonoBehaviour {
 	}
     public IEnumerator State_Idle()
     {
-        print("Idle");
+        //print("Idle");
         CurrentState = AI_ENEMY_STATE.IDLE;
         ThisAnimator.SetTrigger((int)AI_ENEMY_STATE.IDLE);
         ThisAgent.Stop();
@@ -70,7 +67,7 @@ public class AI_Enemy : MonoBehaviour {
 
         while (CurrentState == AI_ENEMY_STATE.IDLE)
         {
-            print("Idle loop");
+            //print("Idle loop");
             if (CanSeePlayer)
             {
                 StartCoroutine(State_Chase());
@@ -87,7 +84,7 @@ public class AI_Enemy : MonoBehaviour {
     }
     public IEnumerator State_Patrol()
     {
-        print("巡逻");
+        //print("巡逻");
         CurrentState = AI_ENEMY_STATE.PATROL;
         ThisAnimator.SetTrigger((int)AI_ENEMY_STATE.PATROL);
         Transform RandomDest = Waypoints[Random.Range(0, Waypoints.Length)];
@@ -126,7 +123,7 @@ public class AI_Enemy : MonoBehaviour {
     }
     public IEnumerator State_Chase()
     {
-        print("追逐");
+        //print("追逐");
         CurrentState = AI_ENEMY_STATE.CHASE;
         ThisAnimator.SetTrigger((int)AI_ENEMY_STATE.CHASE);
         while (CurrentState == AI_ENEMY_STATE.CHASE)
@@ -171,7 +168,7 @@ public class AI_Enemy : MonoBehaviour {
     }
     public IEnumerator State_Attack()//此处是否能控制动画和伤害同步显示？还未解决
     {
-        print("攻击");
+        //print("攻击");
         CurrentState = AI_ENEMY_STATE.ATTACK;
         ThisAnimator.SetTrigger((int)AI_ENEMY_STATE.ATTACK);
         //想动态控制敌人攻击速度，目前未找到实现方法。
