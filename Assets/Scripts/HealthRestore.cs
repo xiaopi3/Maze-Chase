@@ -22,7 +22,7 @@ public class HealthRestore : MonoBehaviour {
     {
         if (other.gameObject.CompareTag("Enemy"))
         {
-
+            //加血
         }
         Destroy(gameObject);
     }

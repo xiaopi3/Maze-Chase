@@ -59,7 +59,9 @@ public class PlayerController : MonoBehaviour {
             PlayerAnim.SetBool("Left", false);
             PlayerAnim.SetBool("Right", false);
             PlayerAnim.SetBool("Run", false);
-            rigd.velocity = Vector3.zero;
+            Vector3 vorg= rigd.velocity;
+            vorg.z = 0;
+            rigd.velocity = vorg;
             ThisTransform.Rotate(Vector3.up, Time.deltaTime * 120 * LR);
         }        
     }

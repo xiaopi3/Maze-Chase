@@ -16,7 +16,7 @@ public class AI_Enemy : MonoBehaviour {
 
     Animator ThisAnimator;
     NavMeshAgent ThisAgent;
-    Transform ThisTransform, PlayerTransform,PlayerView;
+    Transform ThisTransform, PlayerTransform;
     BoxCollider ThisCollider;
     public AI_ENEMY_STATE CurrentState = AI_ENEMY_STATE.IDLE;
     public float DistEps = 1;
@@ -38,7 +38,7 @@ public class AI_Enemy : MonoBehaviour {
         ThisAgent = GetComponent<NavMeshAgent>();
         ThisTransform = transform;
         PlayerTransform = GameObject.FindGameObjectWithTag("Player").transform;
-        PlayerView = PlayerTransform.transform.Find("flag").transform;
+        //PlayerView = PlayerTransform.transform.Find("flag").transform;
         ThisCollider = GetComponent<BoxCollider>();
         EnemyHealthScript = GetComponent<EnemyHealth>();
         Waypoints = (from GameObject GO in GameObject.FindGameObjectsWithTag("Waypoint") select GO.transform).ToArray();
@@ -51,11 +51,11 @@ public class AI_Enemy : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         //CanSeePlayer = false;
-        if (!ThisCollider.bounds.Contains(PlayerView.position))
+        if (!ThisCollider.bounds.Contains(PlayerTransform.position))
             return;
-        
+        print("包含目标");
         CanSeePlayer = HaveLineSightToPlayer(PlayerTransform);
-        
+        print("看到目标" + CanSeePlayer.ToString());
 	}
     public IEnumerator State_Idle()
     {
@@ -94,7 +94,7 @@ public class AI_Enemy : MonoBehaviour {
             //print("正在前往目的地");
             if (CanSeePlayer)
             {
-                
+                print("发现目标");
                 StartCoroutine(State_Chase());
                 yield break;
             }
@@ -116,14 +116,14 @@ public class AI_Enemy : MonoBehaviour {
             return false;
         RaycastHit hitInfo;
         Physics.Linecast(ThisTransform.position, Player.position, out hitInfo);
-        //print(hitInfo.collider);
-        if (Physics.Linecast(ThisTransform.position, Player.position,out hitInfo))
+        //print("检测中间间隔物体："+hitInfo.collider.name);
+        if (!hitInfo.collider.name.Equals("Ethan"))
             return false;
         return true;
     }
     public IEnumerator State_Chase()
     {
-        //print("追逐");
+        print("追逐");
         CurrentState = AI_ENEMY_STATE.CHASE;
         ThisAnimator.SetTrigger((int)AI_ENEMY_STATE.CHASE);
         while (CurrentState == AI_ENEMY_STATE.CHASE)
@@ -168,7 +168,7 @@ public class AI_Enemy : MonoBehaviour {
     }
     public IEnumerator State_Attack()//此处是否能控制动画和伤害同步显示？还未解决
     {
-        //print("攻击");
+        print("攻击");
         CurrentState = AI_ENEMY_STATE.ATTACK;
         ThisAnimator.SetTrigger((int)AI_ENEMY_STATE.ATTACK);
         //想动态控制敌人攻击速度，目前未找到实现方法。
